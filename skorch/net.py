@@ -762,8 +762,20 @@ class NeuralNet:
         is_placeholder_y = uses_placeholder_y(dataset)
 
         batch_count = 0
+        
+        dataset.sample_weight_list = []
+        
         for data in self.get_iterator(dataset, training=training):
             Xi, yi = unpack_data(data)
+            #############
+            """
+            if training:
+                n_weights = len(dataset.sample_weight_list)
+                print('Training phase | N_b: {} | N_w: {}'.format(Xi.shape[0], n_weights))
+            """
+            #############
+            self.sample_weight_list = dataset.sample_weight_list
+            dataset.sample_weight_list = []
             yi_res = yi if not is_placeholder_y else None
             self.notify("on_batch_begin", X=Xi, y=yi_res, training=training)
             step = step_fn(Xi, yi, **fit_params)
